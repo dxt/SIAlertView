@@ -9,7 +9,6 @@
 #import "SIAlertView.h"
 #import "UIWindow+SIUtils.h"
 #import <QuartzCore/QuartzCore.h>
-#import "UIScreen+SN.h"
 
 NSString *const SIAlertViewWillShowNotification = @"SIAlertViewWillShowNotification";
 NSString *const SIAlertViewDidShowNotification = @"SIAlertViewDidShowNotification";
@@ -297,8 +296,15 @@ static SIAlertView *__si_alert_current_view;
 + (void)showBackground
 {
     if (!__si_alert_background_window) {
-        __si_alert_background_window = [[SIAlertBackgroundWindow alloc] initWithFrame:[UIScreen mainScreenNativeBounds]
-                                                                             andStyle:[SIAlertView currentAlertView].backgroundStyle];
+        CGRect frame;
+        
+        if ([[UIScreen mainScreen] respondsToSelector:@selector(nativeBounds)]) {
+            frame = [UIScreen mainScreen].nativeBounds;
+        } else {
+            frame = [UIScreen mainScreen].bounds;
+        }
+        
+        __si_alert_background_window = [[SIAlertBackgroundWindow alloc] initWithFrame:frame andStyle:[SIAlertView currentAlertView].backgroundStyle];
         [__si_alert_background_window makeKeyAndVisible];
         __si_alert_background_window.alpha = 0;
         [UIView animateWithDuration:0.3
