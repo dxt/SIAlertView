@@ -296,15 +296,12 @@ static SIAlertView *__si_alert_current_view;
 + (void)showBackground
 {
     if (!__si_alert_background_window) {
-        CGRect frame;
+        __si_alert_background_window = [[SIAlertBackgroundWindow alloc] initWithFrame:[UIScreen mainScreen].bounds
+                                                                             andStyle:[SIAlertView currentAlertView].backgroundStyle];
         
-        if ([[UIScreen mainScreen] respondsToSelector:@selector(nativeBounds)]) {
-            frame = [UIScreen mainScreen].nativeBounds;
-        } else {
-            frame = [UIScreen mainScreen].bounds;
-        }
+        UIViewController *rootVC = [UIViewController new];
+        __si_alert_background_window.rootViewController = rootVC;
         
-        __si_alert_background_window = [[SIAlertBackgroundWindow alloc] initWithFrame:frame andStyle:[SIAlertView currentAlertView].backgroundStyle];
         [__si_alert_background_window makeKeyAndVisible];
         __si_alert_background_window.alpha = 0;
         [UIView animateWithDuration:0.3
