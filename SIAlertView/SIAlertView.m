@@ -159,6 +159,11 @@ static SIAlertView *__si_alert_current_view;
     [self.alertView setup];
 }
 
+- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator{
+    [self.alertView resetTransition];
+    [self.alertView invalidateLayout];
+}
+
 - (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
 {
     [self.alertView resetTransition];
@@ -701,6 +706,14 @@ static SIAlertView *__si_alert_current_view;
     [self setNeedsLayout];
 }
 
+- (CGFloat)displayContainerWidth{
+    if(self.bounds.size.width >= self.containerWidth + 20){
+        return self.containerWidth;
+    }else{
+        return self.bounds.size.width - 20;
+    }
+}
+
 - (void)validateLayout
 {
     if (!self.isLayoutDirty) {
@@ -712,10 +725,10 @@ static SIAlertView *__si_alert_current_view;
 #endif
     
     CGFloat height = [self preferredHeight];
-    CGFloat left = (self.bounds.size.width - self.containerWidth) * 0.5;
+    CGFloat left = (self.bounds.size.width - self.displayContainerWidth) * 0.5;
     CGFloat top = (self.bounds.size.height - height) * 0.5;
     self.containerView.transform = CGAffineTransformIdentity;
-    self.containerView.frame = CGRectMake(left, top, self.containerWidth, height);
+    self.containerView.frame = CGRectMake(left, top, self.displayContainerWidth, height);
     self.containerView.layer.shadowPath = [UIBezierPath bezierPathWithRoundedRect:self.containerView.bounds cornerRadius:self.containerView.layer.cornerRadius].CGPath;
     
     CGFloat y = CONTENT_PADDING_TOP;
@@ -785,7 +798,7 @@ static SIAlertView *__si_alert_current_view;
     if (self.titleLabel) {
         self.titleLabel.text = self.title;
         self.titleLabel.font = self.titleFont;
-        CGRect rect = [self.titleLabel textRectForBounds:CGRectMake(0, 0, self.containerWidth - CONTENT_PADDING_LEFT * 2, MAXFLOAT) limitedToNumberOfLines:0];
+        CGRect rect = [self.titleLabel textRectForBounds:CGRectMake(0, 0, self.displayContainerWidth - CONTENT_PADDING_LEFT * 2, MAXFLOAT) limitedToNumberOfLines:0];
         return rect.size.height;
     }
     return 0;
@@ -796,7 +809,7 @@ static SIAlertView *__si_alert_current_view;
     if (self.messageLabel) {
         self.messageLabel.text = self.message;
         self.messageLabel.font = self.messageFont;
-        CGRect rect = [self.messageLabel textRectForBounds:CGRectMake(0, 0, self.containerWidth - CONTENT_PADDING_LEFT * 2, MAXFLOAT) limitedToNumberOfLines:0];
+        CGRect rect = [self.messageLabel textRectForBounds:CGRectMake(0, 0, self.displayContainerWidth - CONTENT_PADDING_LEFT * 2, MAXFLOAT) limitedToNumberOfLines:0];
         return rect.size.height;
     }
     return 0;
